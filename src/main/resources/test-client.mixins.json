@@ -1,0 +1,27 @@
+{
+  "required": true,
+  "package": "me.blackilykat.test_client.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "ChatHudMixin",
+    "ChatMixin",
+    "ElderGuardainParticleMixin",
+    "MultiplayerScreenMixin",
+    "SessionMixin",
+    "TitleScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "ClientConnectionMixin",
+    "DecoderHandlerMixin",
+    "NbtCompoundMixin",
+    "NbtIoInvoker",
+    "NbtIoMixin",
+    "NbtTagSizeTrackerMixin",
+    "PacketBundleHandlerMixin",
+    "PacketBundleHandlerMixinInterface",
+    "PacketByteBufMixin"
+  ]
+}
