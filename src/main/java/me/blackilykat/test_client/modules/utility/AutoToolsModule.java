@@ -2,6 +2,7 @@ package me.blackilykat.test_client.modules.utility;
 
 import me.blackilykat.test_client.Main;
 import me.blackilykat.test_client.gui.components.Module;
+import me.blackilykat.test_client.gui.components.options.StringOption;
 import me.blackilykat.test_client.util.Chat;
 import me.blackilykat.test_client.util.WorldUtil;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;

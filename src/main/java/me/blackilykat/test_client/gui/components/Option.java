@@ -1,7 +1,15 @@
 package me.blackilykat.test_client.gui.components;
 
-import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 
-public class Option extends WPlainPanel {
+import net.minecraft.client.gui.widget.ClickableWidget;
 
+public abstract class Option<ValueType> {
+	public String name;
+	public ValueType optionValue;
+	public ClickableWidget widget;
+	public Option(String name, ValueType defaultValue) {
+		this.name = name;
+		optionValue = defaultValue;
+	}
+	
 }

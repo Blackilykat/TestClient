@@ -62,7 +62,7 @@ public class Category extends ButtonWidget {
 	}
 	
 	public Category withModule(Module module) {
-		int moduleWidth = Main.MC.textRenderer.getWidth(module.getMessage()) + 10;
+		int moduleWidth = Main.MC.textRenderer.getWidth(module.getMessage())+16;
 		Main.LOGGER.info("Module (" + module.getMessage() +") width: " + moduleWidth);
 		Main.LOGGER.info("This width: " + width);
 		Main.LOGGER.info("Module width is larger than this width: " + (moduleWidth > width));
@@ -75,7 +75,7 @@ public class Category extends ButtonWidget {
 	public void getModuleList() {
 		Chat.send(this.getMessage().getString() + "'s modules: ");
 		moduleList.forEach(module -> {
-			Chat.send("\t- " + module.getMessage().getString());
+			Chat.send(" - " + module.getMessage().getString());
 		});
 	}
 	
@@ -103,8 +103,9 @@ public class Category extends ButtonWidget {
 	
 	@Override
 	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		boolean hovered = (mouseX>=getX() && mouseY>=getY() && mouseX<getWidth()+getX() && mouseY<getHeight()+getY());
 		MinecraftClient minecraftClient = MinecraftClient.getInstance();
-		fill(matrices, getX(), getY(), getX()+getWidth(), getY()+getHeight(), 0x66FF0000);
+		fill(matrices, getX(), getY(), getX()+getWidth(), getY()+getHeight(), hovered ? hoveredColor : defaultColor);
 		this.drawMessage(matrices, minecraftClient.textRenderer, 0xFFFFFF | MathHelper.ceil(this.alpha * 255.0F) << 24);
 	}
 }

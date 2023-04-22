@@ -7,6 +7,7 @@ import io.github.cottonmc.cotton.gui.widget.WWidget;
 import io.github.cottonmc.cotton.gui.widget.data.InputResult;
 import me.blackilykat.test_client.Main;
 import me.blackilykat.test_client.gui.Gui;
+import me.blackilykat.test_client.gui.OptionsScreen;
 import me.blackilykat.test_client.util.TickRunnableHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -16,6 +17,8 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 
+import java.util.ArrayList;
+
 public class Module extends ButtonWidget {
 	
 	public Runnable activateRunnable;
@@ -23,28 +26,56 @@ public class Module extends ButtonWidget {
 	public Runnable endTickRunnable;
 	public boolean needsInWorld = true;
 	public boolean isEnabled;
-	private int defaultColor = 0xCC333333;
-	private int hoveredColor = 0xEE444444;
-	private int disabledBarColor = 0xAA000000;
-	private int enabledBarColor = 0xEE00AA00;
-	public OptionsButton optionsButton;
+	public static int defaultColor = 0xCC333333;
+	public static int hoveredColor = 0xEE444444;
+	public static int disabledBarColor = 0xAA000000;
+	public static int enabledBarColor = 0xEE00AA00;
+	public ArrayList<Option<?>> optionList = new ArrayList<>();
 	public Module(String name) {
 		super(0, 0, 20, 20, Text.literal(name), widget -> {}, ButtonWidget.DEFAULT_NARRATION_SUPPLIER);
 		isEnabled = false;
-		optionsButton = new OptionsButton(this);
+//		optionsButton = new OptionsButton(this);
 		
 	}
 	
+	public Module withOption(Option<?> option) {
+		optionList.add(option);
+		return this;
+	}
+	
+//	@Override
+//	public void onPress() {
+//
+//		isEnabled = !isEnabled;
+//		if (isEnabled) {
+//			if (activateRunnable != null) activateRunnable.run();
+//			if (endTickRunnable != null) TickRunnableHandler.runAtTickEnd.add(endTickRunnable);
+//		} else {
+//			if (deactivateRunnable != null) deactivateRunnable.run();
+//			if (endTickRunnable != null) TickRunnableHandler.runAtTickEnd.remove(endTickRunnable);
+//		}
+//	}
+	
 	@Override
-	public void onPress() {
-		isEnabled = !isEnabled;
-		if (isEnabled) {
-			if (activateRunnable != null) activateRunnable.run();
-			if (endTickRunnable != null) TickRunnableHandler.runAtTickEnd.add(endTickRunnable);
-		} else {
-			if (deactivateRunnable != null) deactivateRunnable.run();
-			if (endTickRunnable != null) TickRunnableHandler.runAtTickEnd.remove(endTickRunnable);
+	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		if (this.active && this.visible && clicked(mouseX, mouseY)) {
+			if (button == 0) {
+				isEnabled = !isEnabled;
+				if (isEnabled) {
+					if (activateRunnable != null) activateRunnable.run();
+					if (endTickRunnable != null) TickRunnableHandler.runAtTickEnd.add(endTickRunnable);
+				} else {
+					if (deactivateRunnable != null) deactivateRunnable.run();
+					if (endTickRunnable != null) TickRunnableHandler.runAtTickEnd.remove(endTickRunnable);
+				}
+				return true;
+			} else if(button == 1) {
+				Main.MC.setScreen(new OptionsScreen(this));
+				return true;
+			}
 		}
+		
+		return false;
 	}
 	
 //	void setWidth(int width) {
@@ -104,47 +135,57 @@ public class Module extends ButtonWidget {
 	
 	private Module getThis() {return this;}
 	
-	public static class OptionsButton extends WButton {
-		public boolean isHovered = false;
-		public Module parentModule;
-		public OptionsButton(Module parent) {
-			super(Text.of("⚙"));
-			setSize(20, 20);
-			parentModule = parent;
-			setOnClick(() -> {
-				int scale = Main.MC.options.getGuiScale().getValue();
-				Gui.gui.root.add(new OptionsPanel(parentModule), 10, 10, (Main.MC.getWindow().getWidth()/scale)-40, (Main.MC.getWindow().getHeight()/scale)-40);
-			});
-		}
-		
-		
-		private final int defaultColor = 0x00333333;
-		private final int hoveredColor = 0xEE777777;
-		
-		@Override
-		public void paint(MatrixStack matrices, int x, int y, int mouseX, int mouseY) {
-			boolean hovered = (mouseX>=0 && mouseY>=0 && mouseX<getWidth() && mouseY<getHeight());
-			isHovered = false; //0 = regular, 1 = hovered.
-			if (hovered || isFocused()) {
-				isHovered = true;
-			}
-			// draw the box
-			ScreenDrawing.coloredRect(matrices, x, y, getWidth(), getHeight(), isHovered ? hoveredColor : defaultColor);
-			
-			
-			if (this.getLabel()!=null) {
-				// draw the text
-				int textColor = 0xE0E0E0;
-				ScreenDrawing.drawStringWithShadow(matrices, this.getLabel().asOrderedText(), alignment, x, y + ((20 - 8) / 2), width, textColor);
-            /* else if (hovered) {
-				color = 0xFFFFA0;
-			}*/
-				
-				// int xOffset = (icon != null && alignment == HorizontalAlignment.LEFT) ? ICON_SPACING+iconSize+ICON_SPACING : 0;
-			}
-		}
-		
+	@Override
+	public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		boolean hovered = (mouseX>=getX() && mouseY>=getY() && mouseX<getWidth()+getX() && mouseY<getHeight()+getY());
+		fill(matrices, getX(), getY(), getX()+getWidth(), getY()+getHeight(), hovered ? hoveredColor : defaultColor);
+		fill(matrices, getX(), getY(), getX()+2, getY()+getHeight(), isEnabled ? enabledBarColor : disabledBarColor);
+		drawMessage(matrices, Main.MC.textRenderer, 0xFFFFFF | MathHelper.ceil(this.alpha * 255.0F) << 24);
 	}
+	
+//	public static class OptionsButton extends WButton {
+//		public boolean isHovered = false;
+//		public Module parentModule;
+//		public OptionsButton(Module parent) {
+//			super(Text.of("⚙"));
+//			setSize(20, 20);
+//			parentModule = parent;
+//			setOnClick(() -> {
+//				int scale = Main.MC.options.getGuiScale().getValue();
+//				Gui.gui.root.add(new OptionsPanel(parentModule), 10, 10, (Main.MC.getWindow().getWidth()/scale)-40, (Main.MC.getWindow().getHeight()/scale)-40);
+//			});
+//		}
+//
+//
+//		private final int defaultColor = 0x00333333;
+//		private final int hoveredColor = 0xEE777777;
+//
+//		@Override
+//		public void paint(MatrixStack matrices, int x, int y, int mouseX, int mouseY) {
+//			boolean hovered = (mouseX>=0 && mouseY>=0 && mouseX<getWidth() && mouseY<getHeight());
+//			isHovered = false; //0 = regular, 1 = hovered.
+//			if (hovered || isFocused()) {
+//				isHovered = true;
+//			}
+//			// draw the box
+//			ScreenDrawing.coloredRect(matrices, x, y, getWidth(), getHeight(), isHovered ? hoveredColor : defaultColor);
+//
+//
+//			if (this.getLabel()!=null) {
+//				// draw the text
+//				int textColor = 0xE0E0E0;
+//				ScreenDrawing.drawStringWithShadow(matrices, this.getLabel().asOrderedText(), alignment, x, y + ((20 - 8) / 2), width, textColor);
+//            /* else if (hovered) {
+//				color = 0xFFFFA0;
+//			}*/
+//
+//				// int xOffset = (icon != null && alignment == HorizontalAlignment.LEFT) ? ICON_SPACING+iconSize+ICON_SPACING : 0;
+//			}
+//		}
+//
+//
+//
+//	}
 }
 
 /*

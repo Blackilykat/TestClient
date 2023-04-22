@@ -25,7 +25,7 @@ public class AttributeModifier {
 		this.value = value;
 		this.operation = operation;
 		name = "TestClient@"+(new Throwable().getStackTrace()[1].getClassName())+"."+(new Throwable().getStackTrace()[1].getMethodName());
-		Chat.send("Created new attribute modifier " + name);
+//		Chat.send("Created new attribute modifier " + name);
 		instance = Main.MC.player.getAttributeInstance(attribute);
 		modifier = new EntityAttributeModifier(name, value, operation);
 	}
@@ -50,5 +50,9 @@ public class AttributeModifier {
 			remove();
 			add();
 		}
+	}
+	
+	public float getValue() {
+		return value;
 	}
 }

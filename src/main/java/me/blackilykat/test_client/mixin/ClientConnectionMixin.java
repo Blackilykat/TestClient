@@ -13,7 +13,6 @@ import java.util.Arrays;
 
 @Mixin(ClientConnection.class)
 public class ClientConnectionMixin {
-	private static boolean printedOnce = false;
 	
 //	@Inject(method = "disconnect", at = @At("TAIL"))
 	private void testclient$ccDisconnectStacktrace(Text disconnectReason, CallbackInfo ci) {
@@ -22,12 +21,9 @@ public class ClientConnectionMixin {
 	
 	@Inject(method = "exceptionCaught", at = @At("HEAD"), cancellable = true)
 	private void testclient$ccDisableDisconnectOnException(ChannelHandlerContext context, Throwable ex, CallbackInfo ci) {
-		boolean cancel = printedOnce;
-		printedOnce = true;
-		if(cancel){
 			Main.LOGGER.warn("An exception has been caught in ClientConnection, but TestClient stopped the chain.");
 			ex.printStackTrace();
-			if (printedOnce) ci.cancel();
-		}
+			ci.cancel();
+		
 	}
 }

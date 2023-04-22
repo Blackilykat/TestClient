@@ -71,7 +71,7 @@ public class Gui extends Screen{
 			}
 			AtomicInteger yPos = new AtomicInteger(category.getY());
 			if(category.isExtended) category.moduleList.forEach(module -> {
-				Gui.gui.publicAddDrawableChild(module);
+				publicAddDrawableChild(module);
 				module.setX(category.getX());
 				module.setY(yPos.addAndGet(20));
 				module.setWidth(category.getWidth());
@@ -81,7 +81,7 @@ public class Gui extends Screen{
 	
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		
-		this.renderBackground(matrices);
+//		this.renderBackground(matrices);
 		super.render(matrices, mouseX, mouseY, delta);
 	}
 	
